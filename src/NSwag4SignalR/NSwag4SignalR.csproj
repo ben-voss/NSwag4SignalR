@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>NSwag4SignalR</PackageId>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0</FileVersion>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <Title>NSwag4SignalR</Title>
+    <Product>NSwag4SignalR</Product>
+    <Authors>Ben Voß</Authors>
+    <RepositoryUrl>https://github.com/ben-voss/NSwag4SignalR</RepositoryUrl>
+    <RespositoryType>git</RespositoryType>
+    <PackageIcon>Icon.png</PackageIcon>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Summary>Extend OpenAPI and SwaggerUI to support SignalR endpoints</Summary>
+    <Description>Extend OpenAPI and SwaggerUI to support SignalR endpoints</Description>
+    <PackageDescription>Extend OpenAPI and SwaggerUI to support SignalR endpoints</PackageDescription>
+    <Copyright>Copyright © 2025 Ben Voß</Copyright>
+    <Company>Ben Voß</Company>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RootNamespace>NSwag4SignalR</RootNamespace>
+    <AssemblyName>NSwag4SignalR</AssemblyName>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="10.0.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.6.3" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="swaggerui-4-signalr.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../../LICENSE" Pack="true" PackagePath="\" />
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+    <None Include="Icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

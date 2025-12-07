@@ -1,0 +1,1 @@
+docker build --tag=nswag4signalr.example --progress=plain --target=example --file=docker/Dockerfile . 

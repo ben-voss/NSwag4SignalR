@@ -1,0 +1,24 @@
+# Use the official .NET SDK image for building
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS compile
+
+WORKDIR /app
+
+# Copy csproj and restore as distinct layers
+RUN --mount=type=bind,target=/docker-context \
+    cd /docker-context/; \
+    cp NSwag4SignalR.sln /app/; \
+    find . -name "*.csproj" -mindepth 0 -maxdepth 4 -exec cp --parents "{}" /app/ \;
+
+RUN dotnet restore NSwag4SignalR.sln
+
+# Copy everything else and build
+COPY . .
+RUN dotnet build
+RUN dotnet publish ./src/NSwag4SignalR.Example/NSwag4SignalR.Example.csproj -c Release -o /app/publish --no-restore
+
+# Example app image
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS example
+WORKDIR /app
+COPY --from=compile /app/publish .
+
+ENTRYPOINT ["dotnet", "/app/NSwag4SignalR.Example.dll"]
