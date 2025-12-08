@@ -1,0 +1,44 @@
+name: Build & Publish
+
+on:
+  push:
+    branches:
+      - "main"
+      - "build-test"
+    tags:
+      - 'v*.*.*'
+    paths:
+      - '**/*.*'
+      - '!**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get git info
+        id: gitinfo
+        run: |
+          echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+          SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          echo "SHORT_SHA=${SHORT_SHA}" >> $GITHUB_ENV
+          VERSION="0.0.0-${SHORT_SHA}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          # Also expose as job outputs (optional)
+          echo "git_sha=${GITHUB_SHA}" >> $GITHUB_OUTPUT
+          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Build the Docker image
+        run: docker build --build-arg VERSION="${VERSION}" --build-arg GIT_SHA="${GIT_SHA}" --file docker/Dockerfile --target=pack --tag=nswag4signalr.pack:${VERSION}-${SHORT_SHA} .
