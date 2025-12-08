@@ -1,6 +1,10 @@
 # NSwag4SignalR
 
-NSwag4SignalR extends OpenAPI/SwaggerUI to describe SignalR (real-time) endpoints alongside regular HTTP APIs. It provides document processors and helpers to include Hub endpoints and SignalR semantics in generated OpenAPI documents and the Swagger UI.
+[![NuGet version](https://badge.fury.io/nu/NSwag4SignalR.svg)](https://badge.fury.io/nu/NSwag4SignalR)
+
+## Introduction
+
+NSwag4SignalR extends the [NSwag](https://github.com/RicoSuter/NSwag), [OpenAPI/SwaggerUI](https://swagger.io/) toolchain to describe [SignalR](https://learn.microsoft.com/en-us/aspnet/core/signalr/introduction?view=aspnetcore-10.0) (real-time) endpoints alongside regular HTTP APIs. It provides document processors and helpers to include Hub endpoints and SignalR semantics in generated OpenAPI documents and the Swagger UI.
 
 ## Features
 
