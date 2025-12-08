@@ -23,10 +23,34 @@ const maxHubMessages = 3;
 const SignalRPlugin = function (system) {
 
   const _makeHub = function (hubActions, hubUrl, hubMethods) {
+
+    const getAccessToken = () => {
+      const state = system.getState().get("auth").get("authorized");
+
+      if (!state) {
+        return undefined;
+      }
+
+      const authState = state.toJS();
+      const values = Object.keys(authState);
+
+      if (values.length === 0) {
+        return undefined;
+      }
+       
+      const authConfig = values[0];
+
+      if (authConfig.schema.type === "http" && authConfig.schema.scheme === "basic") {
+        return btoa(authConfig.value.username + ":" + authConfig.value.password);
+      } else  {
+        return authConfig.value;
+      }
+    }
+
     // Build and start the SignalR connection
     var hub = new signalR
       .HubConnectionBuilder()
-      .withUrl(hubUrl)
+      .withUrl(hubUrl, { accessTokenFactory: getAccessToken })
       .withAutomaticReconnect()
       .build();
     hubActions.setHub({hubUrl, hub});

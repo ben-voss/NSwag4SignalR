@@ -13,6 +13,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using NSwag;
+using NSwag.Generation.Processors.Security;
 using NSwag4SignalR.Example.Hubs;
 
 namespace NSwag4SignalR.Example;
@@ -35,13 +36,25 @@ public class Startup {
 
         // Add Swagger services
         services.AddOpenApiDocument(options => {
-            options.PostProcess = document => {
-                document.Info = new OpenApiInfo {
+            options.PostProcess = document =>
+            {
+                document.Info = new OpenApiInfo
+                {
                     Version = "v1",
                     Title = "Example API",
                     Description = "NSwag 4 SignalR Example"
                 };
             };
+
+            options.AddSecurity("Basic", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+            {
+                Type = OpenApiSecuritySchemeType.Basic,
+                Name = "Authoization",
+                In = OpenApiSecurityApiKeyLocation.Header,
+                Description = "Provide Basic Authentication"
+            });
+
+            options.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Basic"));
         });
         
         // Add the NSwag4SignalR extension
