@@ -35,14 +35,14 @@ builder.Services.AddControllers();
 // Add Swagger services
 builder.Services.AddOpenApiDocument();
 
-// Add the NSwag4SignalR extension
+// Add the NSwag4SignalR extension to generate OpenAPI schema for SignalR hubs
 builder.Services.AddNSwag4SignalR();
 
 var app = builder.Build();
 
 app.UseOpenApi();
 app.UseSwaggerUi(swaggerUiSettings => {
-    // Use the NSwag4SignalR extension
+    // Use the NSwag4SignalR extension in Swagger UI
     app.UseNSwag4SignalR(swaggerUiSettings);
 });
 
@@ -55,6 +55,7 @@ app.UseEndpoints(endpoints => {
         return Task.CompletedTask;
     });
 
+    // Map the hub
     endpoints.MapHub<MyHub>("/hubs/myhub");
 });
 
