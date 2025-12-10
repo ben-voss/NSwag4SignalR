@@ -1,6 +1,13 @@
 # Use the official .NET SDK image for building
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS compile
 
+RUN apt-get update && \
+    apt-get install -y zip && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN dotnet tool install -g dotnet-reportgenerator-globaltool
+ENV PATH="$PATH:/root/.dotnet/tools"
+
 ARG VERSION
 ARG GIT_SHA
 
@@ -31,3 +38,9 @@ WORKDIR /app
 COPY --from=compile /app/publish .
 
 ENTRYPOINT ["dotnet", "/app/NSwag4SignalR.Example.dll"]
+
+# Unit tests
+FROM compile AS tests
+
+COPY --chmod=777 docker/unit-test-entrypoint.sh .
+RUN ./unit-test-entrypoint.sh

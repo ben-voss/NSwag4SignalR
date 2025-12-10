@@ -19,16 +19,15 @@ using Microsoft.AspNetCore.SignalR;
 namespace NSwag4SignalR;
 
 internal sealed class HubEndpointProvider {
-
     private readonly EndpointDataSource _endpointDataSource;
 
-    public HubEndpointProvider(EndpointDataSource endpointDataSource) {
-        _endpointDataSource = endpointDataSource;
-    }
+    public HubEndpointProvider(EndpointDataSource endpointDataSource)
+        => _endpointDataSource = endpointDataSource;
 
     public IEnumerable<(Type HubType, string Path)> GetHubEndpoints() {
         foreach (var endpoint in _endpointDataSource.Endpoints) {
             var routeEndpoint = endpoint as RouteEndpoint;
+
             if (routeEndpoint != null) {
                 var metadata = routeEndpoint.Metadata;
 
@@ -41,7 +40,7 @@ internal sealed class HubEndpointProvider {
                 if (hubMetadata != null) {
                     var hubType = hubMetadata.HubType;
                     var pattern = routeEndpoint.RoutePattern.RawText ?? string.Empty;
-                                           
+
                     yield return (HubType: hubType, Path: pattern);
                 }
             }

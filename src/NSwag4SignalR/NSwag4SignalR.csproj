@@ -31,6 +31,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -47,4 +48,8 @@
     <None Include="../../README.md" Pack="true" PackagePath="\" />
     <None Include="Icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="NSwag4SignalR.Tests" />
+  </ItemGroup>  
 </Project>

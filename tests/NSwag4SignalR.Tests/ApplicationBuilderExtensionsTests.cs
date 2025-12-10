@@ -12,18 +12,40 @@
 // FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-namespace NSwag4SignalR;
+using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
+using Moq;
+using NSwag.AspNetCore;
+using Shouldly;
+using Xunit;
 
-internal static class GenericResultWrapperTypes {
-    private static bool IsGenericWrapperType(string typeName)
-        => typeName is "Task`1" or "ValueTask`1" or "JsonResult`1" or "ActionResult`1";
+namespace NSwag4SignalR.Tests;
 
-    internal static T RemoveGenericWrapperTypes<T>(T type, Func<T, string> getName, Func<T, T> unwrap) {
-        // We iterate because a common signature is public async Task<ActionResult<T>> Action()
-        while (IsGenericWrapperType(getName(type))) {
-            type = unwrap(type);
-        }
+public sealed class ApplicationBuilderExtensionsTests {
 
-        return type;
+    [Fact]
+    public void UseNSwag4SignalRSetsCustomJavascriptPath() {
+        var settings = new SwaggerUiSettings {
+            Path = "/swagger"
+        };
+        var mockApp = new Mock<IApplicationBuilder>();
+
+        var result = SwaggerUiSettingsExtensions.UseNSwag4SignalR(mockApp.Object, settings);
+
+        settings.CustomJavaScriptPath.ShouldBe("/swagger/swaggerui-4-signalr.js");
+    }
+
+    [Fact]
+    public void UseNSwag4SignalReturnsSettings() {
+        var settings = new SwaggerUiSettings {
+            Path = "/swagger"
+        };
+        var mockApp = new Mock<IApplicationBuilder>();
+
+        var result = SwaggerUiSettingsExtensions.UseNSwag4SignalR(mockApp.Object, settings);
+
+        result.ShouldBeSameAs(settings);
     }
 }
