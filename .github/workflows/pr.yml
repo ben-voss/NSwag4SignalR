@@ -1,13 +1,16 @@
-name: Build for a pull request
+name: Build & Publish
 
 on:
   pull_request:
     branches:
       - "main"
-      - "build-test"
     paths:
       - '**/*.*'
       - '!**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
 
@@ -27,12 +30,7 @@ jobs:
           echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
           SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
           echo "SHORT_SHA=${SHORT_SHA}" >> $GITHUB_ENV
-          # If this run is triggered by a tag, extract version from the ref
-          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/}
-          else
-            VERSION="0.0.0-${SHORT_SHA}"
-          fi
+          VERSION="0.0.0-${SHORT_SHA}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
           # Also expose as job outputs (optional)
           echo "git_sha=${GITHUB_SHA}" >> $GITHUB_OUTPUT
@@ -41,36 +39,3 @@ jobs:
 
       - name: Build the Docker image
         run: docker build --build-arg VERSION="${VERSION}" --build-arg GIT_SHA="${GIT_SHA}" --file docker/Dockerfile --target=pack --tag=nswag4signalr.pack:${VERSION}-${SHORT_SHA} .
-
-      - name: Prepare artifacts directory
-        run: mkdir -p "${{ github.workspace }}/artifacts"
-
-      - name: Pack NuGet inside container
-        run: |
-          # Copy the built nuget package to mounted artifacts folder
-          docker run --rm -v "${{ github.workspace }}/artifacts":/artifacts nswag4signalr.pack:${VERSION}-${SHORT_SHA} /bin/bash -lc "\
-            cp /app/artifacts/* /artifacts"
-      
-      - name: List generated artifacts
-        run: ls -la "${{ github.workspace }}/artifacts" || true
-
-      - name: Upload nupkg artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nupkg
-          path: artifacts/*.nupkg
-
-      - name: Publish NuGet package (only on tag pushes)
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: |
-          echo "Publishing packages from artifacts..."
-          for pkg in artifacts/*.nupkg; do
-            echo "Pushing $pkg"
-            dotnet nuget push "$pkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
-          done
-          for pkg in artifacts/*.snupkg; do
-            echo "Pushing $pkg"
-            dotnet nuget push "$pkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
-          done
