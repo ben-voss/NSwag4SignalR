@@ -27,7 +27,7 @@ public static class OpenApiDocumentBuilderExtensions {
     /// </summary>
     public static IServiceCollection AddNSwag4SignalR(this IServiceCollection services) {
         services.TryAddSingleton<IDocumentProcessor, WebSocketDocumentProcessor>();
-        services.TryAddSingleton<HubEndpointProvider>();
+        services.TryAddSingleton<IHubEndpointProvider, HubEndpointProvider>();
 
         return services;
     }

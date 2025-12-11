@@ -18,7 +18,11 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace NSwag4SignalR;
 
-internal sealed class HubEndpointProvider {
+internal interface IHubEndpointProvider {
+    IEnumerable<(Type HubType, string Path)> GetHubEndpoints();
+}
+
+internal sealed class HubEndpointProvider : IHubEndpointProvider {
     private readonly EndpointDataSource _endpointDataSource;
 
     public HubEndpointProvider(EndpointDataSource endpointDataSource)

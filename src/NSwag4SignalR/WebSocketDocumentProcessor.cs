@@ -27,9 +27,9 @@ internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
     [System.Text.RegularExpressions.GeneratedRegex("(?<!^)([A-Z])")]
     private static partial System.Text.RegularExpressions.Regex HubNameRegex();
     
-    private readonly HubEndpointProvider _hubEndpointProvider;
+    private readonly IHubEndpointProvider _hubEndpointProvider;
 
-    public WebSocketDocumentProcessor(HubEndpointProvider hubEndpointProvider)
+    public WebSocketDocumentProcessor(IHubEndpointProvider hubEndpointProvider)
         => _hubEndpointProvider = hubEndpointProvider;
 
     private static string MakeFriendlyHubName(string hubTypeName) {

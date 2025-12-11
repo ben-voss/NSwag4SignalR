@@ -43,7 +43,7 @@ public sealed class ServiceCollectionExtensionsTests {
         services.AddNSwag4SignalR();
         var serviceProvider = services.BuildServiceProvider();
 
-        var provider = serviceProvider.GetService<HubEndpointProvider>();
+        var provider = serviceProvider.GetService<IHubEndpointProvider>();
         provider.ShouldNotBeNull();
     }
 
@@ -57,7 +57,7 @@ public sealed class ServiceCollectionExtensionsTests {
         processorDescriptor.ShouldNotBeNull();
         processorDescriptor.Lifetime.ShouldBe(ServiceLifetime.Singleton);
 
-        var providerDescriptor = services.FirstOrDefault(sd => sd.ServiceType == typeof(HubEndpointProvider));
+        var providerDescriptor = services.FirstOrDefault(sd => sd.ServiceType == typeof(IHubEndpointProvider));
         providerDescriptor.ShouldNotBeNull();
         providerDescriptor.Lifetime.ShouldBe(ServiceLifetime.Singleton);
     }
@@ -84,7 +84,7 @@ public sealed class ServiceCollectionExtensionsTests {
         var processors = serviceProvider.GetServices<IDocumentProcessor>().ToList();
         processors.Count.ShouldBe(1);
 
-        var providers = serviceProvider.GetServices<HubEndpointProvider>().ToList();
+        var providers = serviceProvider.GetServices<IHubEndpointProvider>().ToList();
         providers.Count.ShouldBe(1);
     }
 }
