@@ -11,6 +11,7 @@
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
 // FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"use strict";
 
 // Load the SignalR script
 var script = document.createElement("script");
@@ -55,7 +56,7 @@ const SignalRPlugin = function (system) {
       .build();
     hubActions.setHub({hubUrl, hub});
 
-    hubActions.setStatus({hubUrl, status: "connecting"})
+    hubActions.setStatus({hubUrl, status: "connecting"});
 
     hubMethods.forEach(method => {
       hub.on(method, function (message) {
@@ -64,24 +65,24 @@ const SignalRPlugin = function (system) {
             path: hubUrl + "!" + method,
             message: JSON.stringify(message),
             type: "receive",
-          })
+          });
         });
     });
     
     hub.onreconnecting(error => {
       console.assert(hub.state === signalR.HubConnectionState.Reconnecting);
-      hubActions.setStatus({hubUrl, status: "reconnecting"})
+      hubActions.setStatus({hubUrl, status: "reconnecting"});
     });
 
     hub.onreconnected(error => {
         console.assert(hub.state === signalR.HubConnectionState.Connected);
-        hubActions.setStatus({hubUrl, status: "connected"})
+        hubActions.setStatus({hubUrl, status: "connected"});
     });
 
     // Start the hub connection
     return hub.start()
       .then(function () {
-        hubActions.setStatus({hubUrl, status: "connected"})
+        hubActions.setStatus({hubUrl, status: "connected"});
         return hub;
       }).catch(function (err) {
         console.error(hubUrl, err.toString());
@@ -116,8 +117,6 @@ const SignalRPlugin = function (system) {
   return {
     statePlugins: {
       spec: {
-        selectors: {
-        },
         wrapSelectors: {
           // put = stream from server
           // get = notification from server to client
@@ -125,7 +124,7 @@ const SignalRPlugin = function (system) {
 
           // Hide the "execute" button for SignalR hub notifications
           allowTryItOutFor: (ori) => (_, path, schema) => {
-            return path.indexOf("!") == -1 || schema === "post" || schema == "put"
+            return path.indexOf("!") == -1 || schema === "post" || schema == "put";
           },
         },
         wrapActions: {
@@ -157,7 +156,7 @@ const SignalRPlugin = function (system) {
             }
 
             // Build parameters list from the args.parameters object properties
-            paramValues = [];
+            const paramValues = [];
             for (var prop in args.parameters) {
               if (args.parameters.hasOwnProperty(prop)) {
                 paramValues.push(args.parameters[prop]);                
@@ -229,8 +228,8 @@ const SignalRPlugin = function (system) {
                   path: pathName,
                   message: paramValues,
                   type: "send"
-                })
-                specActions.setMutatedRequest(pathName, method, {url: pathName})
+                });
+                specActions.setMutatedRequest(pathName, method, {url: pathName});
                 specActions.setResponse(pathName, method, {
                   headers: "",
                   status: 200,
@@ -288,7 +287,7 @@ const SignalRPlugin = function (system) {
             return {
               type: "CLEAR_HUB_MESSAGES",
               payload: {path},
-            }
+            };
           },
           setStreamSubscription: ({path, subscription}) => {
             return {
@@ -301,66 +300,66 @@ const SignalRPlugin = function (system) {
           SET_HUB: (state, {payload}) => {
             const {hubUrl, hub} = payload;
             const hubs = state.get("hubs") || {};
-            return state.set("hubs", {...hubs, [hubUrl]: hub})
+            return state.set("hubs", {...hubs, [hubUrl]: hub});
           },          
           SET_HUB_STATUS: (state, {payload}) => {
             const {hubUrl, status} = payload
-            const statuses = state.get("statuses") || {}
-            return state.set("statuses", {...statuses, [hubUrl]: status})
+            const statuses = state.get("statuses") || {};
+            return state.set("statuses", {...statuses, [hubUrl]: status});
           },
           ADD_HUB_MESSAGE: (state, {payload}) => {
-            const {path, message, type} = payload
-            const messages = state.get("messages") || {}
+            const {path, message, type} = payload;
+            const messages = state.get("messages") || {};
 
             if (!(path in messages)) {
-              messages[path] = []
+              messages[path] = [];
             }
 
             // Add the new message to the start of the messages array
-            messages[path].unshift({message, type, timestamp: new Date()})
+            messages[path].unshift({message, type, timestamp: new Date()});
 
             // Remove the last message if we have reached capacity
             if (maxHubMessages && messages[path].length > maxHubMessages) {
-              messages[path].pop()
+              messages[path].pop();
             }
 
-            return state.set("messages", {...messages})
+            return state.set("messages", {...messages});
           },
           CLEAR_HUB_MESSAGES: (state, {payload}) => {
-            const {path} = payload
-            const messages = state.get("messages") || {}
+            const {path} = payload;
+            const messages = state.get("messages") || {};
             if (path in messages) {
-              messages[path] = []
+              messages[path] = [];
             }
 
-            return state.set("messages", {...messages})
+            return state.set("messages", {...messages});
           },
           SET_HUB_STREAM_SUBSCRIPTION: (state, {payload}) => {
-            const {path, subscription} = payload
-            const subscriptions = state.get("streamSubscriptions") || {}
-            return state.set("streamSubscriptions", {...subscriptions, [path]: subscription})
+            const {path, subscription} = payload;
+            const subscriptions = state.get("streamSubscriptions") || {};
+            return state.set("streamSubscriptions", {...subscriptions, [path]: subscription});
           },
         },
         selectors: {
           // Get the hub object for a given path
           getHub: (state, hubUrl) => {
-            const hubs = state.get("hubs") || {}
-            return hubs[hubUrl]
+            const hubs = state.get("hubs") || {};
+            return hubs[hubUrl];
           },
           // Get the status of the hub connection for a given path
           getHubStatus: (state, hubUrl) => {
-            const statuses = state.get("statuses") || {}
-            return statuses[hubUrl] || "closed"
+            const statuses = state.get("statuses") || {};
+            return statuses[hubUrl] || "closed";
           },
           // Get the messages for a given hub path
           getHubMessages: (state, path) => {
-            const messages = state.get("messages") || {}
-            return messages[path] || []
+            const messages = state.get("messages") || {};
+            return messages[path] || [];
           },
           // Get the stream subscripton for a given hub path
           getStreamSubscription: (state, path) => {
-            const streamSubscriptions = state.get("streamSubscriptions") || {}
-            return streamSubscriptions[path]
+            const streamSubscriptions = state.get("streamSubscriptions") || {};
+            return streamSubscriptions[path];
           }
         },
       }
@@ -370,13 +369,14 @@ const SignalRPlugin = function (system) {
       SignalRMessage: ({response}) => {
         const { React } = system;
         const { content, timestamp } = response;
-        const highlightCodeComponent = system.getComponent("HighlightCode", true)
+        const highlightCodeComponent = system.getComponent("HighlightCode", true);
 
-        const downloadName = "response_" + new Date().getTime()
+        const downloadName = "response_" + new Date().getTime();
+        let body;
         try {
-          body = JSON.stringify(JSON.parse(content), null, "  ")
+          body = JSON.stringify(JSON.parse(content), null, "  ");
         } catch (error) {
-          body = "Can't parse JSON.  Raw result:\n\n" + content
+          body = "Can't parse JSON.  Raw result:\n\n" + content;
         }
 
         return React.createElement(
@@ -384,7 +384,7 @@ const SignalRPlugin = function (system) {
           {},
           React.createElement("h5", {}, timestamp.toISOString()),
           React.createElement(highlightCodeComponent, {language: "json", canCopy: true, downloadable: true, downloadName}, body)
-        ) 
+        );
       },
       SignalRResponse: ({response, props}) => {
         const {React} = system;
@@ -396,14 +396,15 @@ const SignalRPlugin = function (system) {
           ? {padding: 6, display: "inline-block" }
           : {padding: 6, display: "inline-block", background: "#f93e3e"};
 
-        const downloadName = "response_" + new Date().getTime()
+        const downloadName = "response_" + new Date().getTime();
+        let body;
         try {
-          body = JSON.stringify(JSON.parse(content), null, "  ")
+          body = JSON.stringify(JSON.parse(content), null, "  ");
         } catch (error) {
-          body = "Can't parse JSON.  Raw result:\n\n" + content
+          body = "Can't parse JSON.  Raw result:\n\n" + content;
         }
         
-        const highlightCodeComponent = system.getComponent("HighlightCode", true)
+        const highlightCodeComponent = system.getComponent("HighlightCode", true);
 
         return React.createElement(
           "tr",
@@ -422,7 +423,7 @@ const SignalRPlugin = function (system) {
           React.createElement("td", {class: "response-col_event", style: {width: "100%"}}, 
             React.createElement(highlightCodeComponent, {language: "json", canCopy: content != null, downloadable: content != null, downloadName}, content)
           )
-        )
+        );
       },
       SignalRResponses: ({hubActions, hubSelectors, specSelectors, ...props}) => {
         const {React} = system;
@@ -451,7 +452,7 @@ const SignalRPlugin = function (system) {
 
           const response = specSelectors.responseFor(path, method);
           if (response != undefined) {
-            rows = [React.createElement(signalRResponseComponent, {response})]
+            rows = [React.createElement(signalRResponseComponent, {response})];
           }
         }
 
@@ -593,8 +594,7 @@ const SignalRPlugin = function (system) {
         }
       },
       Message: ({message, type}) => {
-        const {React, getComponent, getConfigs} = system
-
+        const {React, getComponent, getConfigs} = system;
         const ResponseBody = getComponent("responseBody");
 
         const body = React.createElement(ResponseBody, {
@@ -602,9 +602,9 @@ const SignalRPlugin = function (system) {
           contentType: "application/json",
           getConfigs,
           getComponent
-        })
+        });
 
-        const background = type === "send" ? "#ffa500" : "#49cc90"
+        const background = type === "send" ? "#ffa500" : "#49cc90";
         return React.createElement("tr", {},
           React.createElement("td", {class: "response-col_event"},
             React.createElement("span", {
@@ -614,7 +614,7 @@ const SignalRPlugin = function (system) {
               type.toUpperCase()),
           ),
           React.createElement("td", {class: "response-col_description"}, body)
-        )
+        );
       }, 
     },
 
@@ -625,7 +625,7 @@ const SignalRPlugin = function (system) {
       // use the default parameter validation etc.
       execute: (Original, system) => (props) => {
         const { React, hubSelectors, hubActions } = system;
-        const { path, method, disabled } = props
+        const { path, method, disabled } = props;
 
         // Use the original button for anything that isnt SignalR stream
         if (path.indexOf('!') < 0 || method !== "put") {
@@ -639,7 +639,7 @@ const SignalRPlugin = function (system) {
         if (subscription) {
           const action = () => {
             subscription.dispose();
-            hubActions.setStreamSubscription({path, subscription: undefined})
+            hubActions.setStreamSubscription({path, subscription: undefined});
           };
 
           return React.createElement(
@@ -759,7 +759,7 @@ const SignalRPlugin = function (system) {
           const subscription = hubSelectors.getStreamSubscription(path);
           if (subscription) {
             subscription.dispose();
-            hubActions.setStreamSubscription({path, subscription: undefined})
+            hubActions.setStreamSubscription({path, subscription: undefined});
           }
           original();
         }
