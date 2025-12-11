@@ -13,6 +13,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NSwag.Generation.Processors;
 
 namespace NSwag4SignalR;
@@ -20,15 +21,13 @@ namespace NSwag4SignalR;
 /// <summary>
 /// Extensions for adding NSwag4SignalR services to generating OpenAPI specifications from SignalR.
 /// </summary>
-public static class OpenApiDocumentBuilderExtensions
-{
+public static class OpenApiDocumentBuilderExtensions {
     /// <summary>
     /// Adds NSwag4SignalR services to generating OpenAPI specifications from SignalR
     /// </summary>
-    public static IServiceCollection AddNSwag4SignalR(this IServiceCollection services)
-    {
-        services.AddSingleton<IDocumentProcessor, WebSocketDocumentProcessor>();
-        services.AddSingleton<HubEndpointProvider>();
+    public static IServiceCollection AddNSwag4SignalR(this IServiceCollection services) {
+        services.TryAddSingleton<IDocumentProcessor, WebSocketDocumentProcessor>();
+        services.TryAddSingleton<HubEndpointProvider>();
 
         return services;
     }
