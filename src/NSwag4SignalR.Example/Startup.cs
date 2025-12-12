@@ -79,8 +79,6 @@ public class Startup {
                 app.UseNSwag4SignalR(swaggerUiSettings);
             });
 
-        app.UseStaticFiles();
-
         app.UseEndpoints(endpoints => {
             endpoints.MapControllers();
 

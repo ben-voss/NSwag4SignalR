@@ -15,7 +15,7 @@
 
 // Load the SignalR script
 var script = document.createElement("script");
-script.src = "/js/signalr/dist/browser/signalr.js";
+script.src = "https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/9.0.6/signalr.min.js";
 document.head.appendChild(script);
 
 // Config for the maximum number of messages to dispay for streams and notifications
