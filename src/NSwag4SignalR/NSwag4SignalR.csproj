@@ -32,6 +32,7 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackageTags>NSwag;SignalR;Swagger;SwaggerUI;OpenAPI</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
