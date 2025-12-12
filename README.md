@@ -1,6 +1,6 @@
 # NSwag4SignalR
 
-[![NuGet version](https://badge.fury.io/nu/NSwag4SignalR.svg)](https://badge.fury.io/nu/NSwag4SignalR)
+[![NuGet version](https://badge.fury.io/nu/NSwag4SignalR.svg)](https://badge.fury.io/nu/NSwag4SignalR) [![Build](https://github.com/ben-voss/NSwag4SignalR/actions/workflows/build.yml/badge.svg)]([foo](https://github.com/ben-voss/NSwag4SignalR/actions/workflows/build.yml))
 
 ## Introduction
 
