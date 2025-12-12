@@ -88,7 +88,7 @@ const SignalRPlugin = function (system) {
         console.error(hubUrl, err.toString());
         throw err;
     });
-  }
+  };
 
   const _stringify = (thing) => {
     if (typeof thing === "string") {
@@ -112,7 +112,7 @@ const SignalRPlugin = function (system) {
     }
 
     return thing.toString();
-  }
+  };
 
   return {
     statePlugins: {
@@ -124,14 +124,14 @@ const SignalRPlugin = function (system) {
 
           // Hide the "execute" button for SignalR hub notifications
           allowTryItOutFor: (ori) => (_, path, schema) => {
-            return path.indexOf("!") == -1 || schema === "post" || schema == "put";
+            return path.indexOf("!") === -1 || schema === "post" || schema === "put";
           },
         },
         wrapActions: {
           // Handle execute button presses after arguments have been validated.
           executeRequest: (oriAction, system) => async (args) => {
-            const {hubActions, specActions, hubSelectors } = system;
-            const {pathName, method, operation} = args;
+            const { hubActions, specActions, hubSelectors } = system;
+            const { pathName, method } = args;
 
             // Examine the operation to see if it's an attempt to open a connection to a SignalR hub
             if (pathName.indexOf("!") < 0) {
@@ -301,7 +301,7 @@ const SignalRPlugin = function (system) {
             const {hubUrl, hub} = payload;
             const hubs = state.get("hubs") || {};
             return state.set("hubs", {...hubs, [hubUrl]: hub});
-          },          
+          },
           SET_HUB_STATUS: (state, {payload}) => {
             const {hubUrl, status} = payload
             const statuses = state.get("statuses") || {};
@@ -615,7 +615,7 @@ const SignalRPlugin = function (system) {
           ),
           React.createElement("td", {class: "response-col_description"}, body)
         );
-      }, 
+      }
     },
 
     wrapComponents: {
@@ -717,7 +717,7 @@ const SignalRPlugin = function (system) {
               hubActions,
               hubSelectors,
               specSelectors,
-              ...props,
+              ...props
             }
           );
         }

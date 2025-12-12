@@ -2,8 +2,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS compile
 
 RUN apt-get update && \
-    apt-get install -y zip && \
+    apt-get install -y zip npm && \
     rm -rf /var/lib/apt/lists/*
+
+RUN npm install uglify-js -g
 
 RUN dotnet tool install -g dotnet-reportgenerator-globaltool
 ENV PATH="$PATH:/root/.dotnet/tools"
@@ -26,6 +28,8 @@ RUN dotnet restore NSwag4SignalR.sln
 
 # Copy everything else and build
 COPY . .
+RUN uglifyjs src/NSwag4SignalR/swaggerui-4-signalr.js -o swaggerui-4-signalr.min.js -c
+RUN mv swaggerui-4-signalr.min.js src/NSwag4SignalR/swaggerui-4-signalr.js
 RUN dotnet build
 RUN dotnet publish ./src/NSwag4SignalR.Example/NSwag4SignalR.Example.csproj -c Release -o /app/publish --no-restore
 
