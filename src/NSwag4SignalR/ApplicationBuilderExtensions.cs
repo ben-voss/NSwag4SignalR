@@ -30,8 +30,7 @@ public static class SwaggerUiSettingsExtensions {
     public static SwaggerUiSettings UseNSwag4SignalR(this IApplicationBuilder app, SwaggerUiSettings settings) {
         settings.CustomJavaScriptPath = new PathString(settings.Path).Add("/swaggerui-4-signalr.js").Value;
 
-        app.UseFileServer(new FileServerOptions
-        {
+        app.UseFileServer(new FileServerOptions {
             RequestPath = new PathString(settings.Path),
             FileProvider = new EmbeddedFileProvider(typeof(SwaggerUiSettingsExtensions).GetTypeInfo().Assembly, nameof(NSwag4SignalR))
         });
