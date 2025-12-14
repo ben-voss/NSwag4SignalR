@@ -26,7 +26,7 @@ namespace NSwag4SignalR;
 internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
     [System.Text.RegularExpressions.GeneratedRegex("(?<!^)([A-Z])")]
     private static partial System.Text.RegularExpressions.Regex HubNameRegex();
-    
+
     private readonly IHubEndpointProvider _hubEndpointProvider;
 
     public WebSocketDocumentProcessor(IHubEndpointProvider hubEndpointProvider)
@@ -66,7 +66,7 @@ internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
             }
         }
     }
-    
+
     public static IEnumerable<MethodInfo> GetWeakHubMethods(Type hubType) {
         // Get all public instance methods that are not part of IDisposable and are considered hub methods
         var methods = hubType.GetMethods(BindingFlags.Public | BindingFlags.Instance);
@@ -136,7 +136,7 @@ internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
 
         return false;
     }
-    
+
     private static void GenerateSuccessResponse(MethodInfo methodInfo, string successXmlDescription, OpenApiOperation operation, DocumentProcessorContext context) {
         var returnParameter = methodInfo.ReturnParameter;
         var returnType = returnParameter.ParameterType;

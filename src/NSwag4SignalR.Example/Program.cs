@@ -14,10 +14,8 @@
 
 namespace NSwag4SignalR.Example;
 
-public class Program
-{
-    public static int Main(string[] args)
-    {
+public class Program {
+    public static int Main(string[] args) {
         // Create a logger factory with OpenTelemetry
         using var loggerFactory = LoggerFactory.Create(c => c.AddConsole());
 
@@ -27,14 +25,11 @@ public class Program
         // Log a simple message
         logger.LogInformation("Starting NSwag4SignalR Example Web Server");
 
-        try
-        {
+        try {
             CreateHostBuilder(args)
                 .Build()
                 .Run();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             logger.LogCritical(e, "Host terminated unexpectedly");
         }
 
@@ -45,8 +40,7 @@ public class Program
         => Host
             .CreateDefaultBuilder(args)
             .UseConsoleLifetime()
-            .ConfigureWebHostDefaults(x =>
-            {
+            .ConfigureWebHostDefaults(x => {
                 x.UseStartup<Startup>();
             });
 }

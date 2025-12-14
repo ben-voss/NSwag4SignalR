@@ -36,18 +36,15 @@ public class Startup {
 
         // Add Swagger services
         services.AddOpenApiDocument(options => {
-            options.PostProcess = document =>
-            {
-                document.Info = new OpenApiInfo
-                {
+            options.PostProcess = document => {
+                document.Info = new OpenApiInfo {
                     Version = "v1",
                     Title = "Example API",
                     Description = "NSwag 4 SignalR Example"
                 };
             };
 
-            options.AddSecurity("Basic", Enumerable.Empty<string>(), new OpenApiSecurityScheme
-            {
+            options.AddSecurity("Basic", Enumerable.Empty<string>(), new OpenApiSecurityScheme {
                 Type = OpenApiSecuritySchemeType.Basic,
                 Name = "Authoization",
                 In = OpenApiSecurityApiKeyLocation.Header,
@@ -56,7 +53,7 @@ public class Startup {
 
             options.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("Basic"));
         });
-        
+
         // Add the NSwag4SignalR extension
         services.AddNSwag4SignalR();
     }
@@ -71,8 +68,7 @@ public class Startup {
         // Enable Swagger middleware
         app
             .UseOpenApi()
-            .UseSwaggerUi(swaggerUiSettings =>
-            {
+            .UseSwaggerUi(swaggerUiSettings => {
                 swaggerUiSettings.EnableTryItOut = true;
 
                 // Use the NSwag4SignalR extension

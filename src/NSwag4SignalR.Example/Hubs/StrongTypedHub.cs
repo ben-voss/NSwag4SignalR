@@ -47,34 +47,29 @@ public class StronglyTypedHub : Hub<IStrongTypedHub> {
     /// </remarks>
     /// <param name="message">The message to send.</param>
     /// <returns>Returns a task.</returns>
-    public async Task Send(string message)
-    {
+    public async Task Send(string message) {
         await Clients.All.Receive(message);
     }
 
     /// <summary>
     /// Returns the message parameter
     /// </summary>
-    public string Echo(string message)
-    {
+    public string Echo(string message) {
         return message;
     }
 
     /// <summary>
     /// Throws an error
     /// </summary>
-    public void Error()
-    {
+    public void Error() {
         throw new ApplicationException("Test exeption");
     }
 
     /// <summary>
     /// Returns a non-null structured object
     /// </summary>
-    public TestDto Structured()
-    {
-        return new TestDto
-        {
+    public TestDto Structured() {
+        return new TestDto {
             StringProperty = "Hello World",
             IntProperty = 42
         };
@@ -96,7 +91,7 @@ public class StronglyTypedHub : Hub<IStrongTypedHub> {
     public bool ComplexInputs(string str, int intValue, bool value, float floatValue, Decimal decimalValue, DateTime dateTimeValue, Guid guidValue, TestDto testDto, string optional = "test") {
         return true;
     }
-    
+
     /// <summary>
     /// Listens to a stream of changes to the current time.
     /// </summary>
@@ -105,10 +100,8 @@ public class StronglyTypedHub : Hub<IStrongTypedHub> {
             FullMode = BoundedChannelFullMode.Wait
         });
 
-        var task = Task.Run(async () =>
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
+        var task = Task.Run(async () => {
+            while (!cancellationToken.IsCancellationRequested) {
                 await channel.Writer.WriteAsync(DateTime.UtcNow);
 
                 await Task.Delay(1000, cancellationToken);
