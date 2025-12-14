@@ -157,9 +157,38 @@ const SignalRPlugin = function (system) {
 
             // Build parameters list from the args.parameters object properties
             const paramValues = [];
-            for (var prop in args.parameters) {
-              if (args.parameters.hasOwnProperty(prop)) {
-                paramValues.push(args.parameters[prop]);                
+            const parameterSchema = args.operation.get("parameters").toJS();
+            for (let index = 0; index < parameterSchema.length; index++) {
+              const paramSchema = parameterSchema[index];
+              if (args.parameters.hasOwnProperty("query." + paramSchema.name)) {
+                const paramValue = args.parameters["query." + paramSchema.name];
+
+                switch (paramSchema.schema.type) {
+                  case 'integer': {
+                    paramValues.push(parseInt(paramValue, 10));
+                    break;
+                  }
+
+                  case 'boolean': {
+                    paramValues.push(paramValue === "true");
+                    break;
+                  }
+                  
+                  case 'number': {
+                    paramValues.push(parseFloat(paramValue));
+                    break;
+                  }
+
+                  case 'object': {
+                    paramValues.push(JSON.parse(paramValue));
+                    break;
+                  }
+
+                  default: {
+                    paramValues.push(paramValue);
+                    break;
+                  }
+                }
               }
             }
 
@@ -211,7 +240,7 @@ const SignalRPlugin = function (system) {
 
                       hubActions.addMessage({
                         path: pathName,
-                        message: err.toString(),
+                        message: JSON.stringify(err),
                         type: "receive",
                       });
                     },

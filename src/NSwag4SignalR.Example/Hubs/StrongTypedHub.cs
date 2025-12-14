@@ -83,15 +83,20 @@ public class StronglyTypedHub : Hub<IStrongTypedHub> {
     /// <summary>
     /// Returns a nullable structured object
     /// </summary>
-    public TestDto? Structured2()
-    {
-        return new TestDto
-        {
+    public TestDto? Structured2() {
+        return new TestDto {
             StringProperty = "Hello World",
             IntProperty = 42
         };
     }
 
+    /// <summary>
+    /// Ensures we can invoke a method with a variety of data types
+    /// </summary>
+    public bool ComplexInputs(string str, int intValue, bool value, float floatValue, Decimal decimalValue, DateTime dateTimeValue, Guid guidValue, TestDto testDto, string optional = "test") {
+        return true;
+    }
+    
     /// <summary>
     /// Listens to a stream of changes to the current time.
     /// </summary>
