@@ -102,35 +102,25 @@ internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
                 OperationId = hubType.Name + "!" + method.Name,
                 Tags = { friendlyHubName },     // This sets the group name
                 Schemes = new List<OpenApiSchema> { OpenApiSchema.Ws, OpenApiSchema.Wss },
-                //ExtensionData = new Dictionary<string, object?> {
-                //    { "x-websocket-subprotocol", "signalr" }
-                //},
             };
 
             foreach (var parameter in method.GetParameters()) {
-
+                // Skip cancellation tokens as they aren't exposed on the API interface
                 if (parameter.ParameterType == typeof(CancellationToken)) {
                     continue;
                 }
 
-                var description = parameter.GetXmlDocs();
-
                 operation.Parameters.Add(new OpenApiParameter {
                     Name = parameter.Name,
                     Kind = OpenApiParameterKind.Query,
-                    Description = description,
+                    Description = parameter.GetXmlDocs(),
                     IsRequired = !parameter.IsOptional,
-                    Schema = new JsonSchema {
-                        Type = GetJsonObjectType(parameter.ParameterType),
-                        Format = GetJsonFormat(parameter.ParameterType)
-                    },
+                    Schema = JsonSchema.FromType(parameter.ParameterType),
                     Position = parameter.Position
                 });
             }
 
-            var isNullable = HasNullableReturnType(method);
-
-            LoadDefaultSuccessResponse(isNullable, method.ReturnParameter, "Success", operation, context);
+            GenerateSuccessResponse(method, "Success", operation, context);
 
             pathItem.Add(operationMethod, operation);
             document.Paths.Add(path + "!" + method.Name, pathItem);
@@ -147,7 +137,8 @@ internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
         return false;
     }
     
-    private static void LoadDefaultSuccessResponse(bool isNullable, ParameterInfo returnParameter, string successXmlDescription, OpenApiOperation operation, DocumentProcessorContext context) {
+    private static void GenerateSuccessResponse(MethodInfo methodInfo, string successXmlDescription, OpenApiOperation operation, DocumentProcessorContext context) {
+        var returnParameter = methodInfo.ReturnParameter;
         var returnType = returnParameter.ParameterType;
         if (returnType == typeof(Task)) {
             returnType = typeof(void);
@@ -164,6 +155,8 @@ internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
             var returnParameterAttributes = returnParameter?.GetCustomAttributes(false)?.OfType<Attribute>() ?? [];
             var contextualReturnParameter = returnType.ToContextualType(returnParameterAttributes);
 
+            var isNullable = HasNullableReturnType(methodInfo);
+
             var settings = context.Settings.SchemaSettings;
             var typeDescription = settings.ReflectionService.GetDescription(contextualReturnParameter, context.Settings.SchemaSettings);
             var responseSchema = context.SchemaGenerator.GenerateWithReferenceAndNullability<NJsonSchema.JsonSchema>(
@@ -173,72 +166,12 @@ internal partial class WebSocketDocumentProcessor : IDocumentProcessor {
                 Description = successXmlDescription,
                 IsNullableRaw = isNullable,
                 Schema = responseSchema,
-                //ExtensionData = new Dictionary<string, object?> {
-                //    { "x-signalr-streaming", returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(IAsyncEnumerable<>) }
-                //},
             };
         }
     }
 
     private static bool IsVoidResponse(Type returnType)
         => returnType == null || returnType.FullName == "System.Void";
-
-    private static string? GetJsonFormat(Type type) {
-        if (type == typeof(DateTimeOffset)) {
-            return "date-time";
-        }
-
-        if (type == typeof(DateTime)) {
-            return "date-time";
-        }
-
-        if (type == typeof(Guid)) {
-            return "guid";
-        }
-
-        return null;
-    }
-
-    private static JsonObjectType GetJsonObjectType(Type type) {
-        switch (Type.GetTypeCode(type)) {
-            case TypeCode.Empty:
-            case TypeCode.DBNull:
-            return JsonObjectType.None;
-            case TypeCode.Char:
-            case TypeCode.String:
-            case TypeCode.DateTime:
-            return JsonObjectType.String;
-            case TypeCode.Boolean:
-            return JsonObjectType.Boolean;
-            case TypeCode.Byte:
-            case TypeCode.SByte:
-            case TypeCode.Int16:
-            case TypeCode.UInt16:
-            case TypeCode.Int32:
-            case TypeCode.UInt32:
-            case TypeCode.Int64:
-            case TypeCode.UInt64:
-            return JsonObjectType.Integer;
-            case TypeCode.Single:
-            case TypeCode.Double:
-            case TypeCode.Decimal:
-            return JsonObjectType.Number;
-        }
-
-        if (type == typeof(DateTimeOffset)) {
-            return JsonObjectType.String; // with format "date-time"
-        }
-
-        if (type.IsArray || (type.IsGenericType && typeof(IEnumerable<>).IsAssignableFrom(type.GetGenericTypeDefinition()))) {
-            return JsonObjectType.Array;
-        }
-
-        if (type == typeof(Guid)) {
-            return JsonObjectType.String; // with format "uuid"
-        }
-
-        return JsonObjectType.Object;
-    }
 
     public void Process(DocumentProcessorContext context) {
         // Get the paths of all registered Hubs
